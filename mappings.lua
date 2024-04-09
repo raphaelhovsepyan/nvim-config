@@ -3,6 +3,10 @@
 -- Please use this mappings table to set keyboard mapping since this is the
 -- lower level configuration and more robust one. (which-key will
 -- automatically pick-up stored data by this setting.)
+function get_git_branch()
+    local branch = vim.fn.system('git rev-parse --abbrev-ref HEAD 2>/dev/null')
+    return string.gsub(branch, '\n', '')  -- Remove newline character
+end
 return {
   -- first key is the mode
   n = {
@@ -31,6 +35,19 @@ return {
       function()
         require("telescope").extensions.live_grep_args.live_grep_args()
       end
+    },
+    ["<leader>gH"] = {
+      function()
+        local current_buffer = vim.api.nvim_get_current_buf()
+        local file_path = vim.api.nvim_buf_get_name(current_buffer)
+        local current_directory = vim.fn.getcwd()
+        local project_root = vim.fn.finddir('.git', current_directory .. ';')
+        local relative_path = vim.fn.fnamemodify(file_path, ":~:" .. project_root)
+        local line_number = vim.fn.line('.')
+        local branch = get_git_branch()
+        os.execute("open https://github.com/krispai/kr-api/blob/" .. branch .. "/" .. relative_path .. "#L" .. line_number)
+      end,
+      desc = "Open file in github"
     },
     -- tables with the `name` key will be registered with which-key if it's installed
     -- this is useful for naming menus

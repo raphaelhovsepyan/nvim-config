@@ -21,6 +21,9 @@ return {
           keymap = {
             accept = "<C-l>"
           }
+        },
+        filetypes = {
+          gitcommit = true
         }
       });
     end,
